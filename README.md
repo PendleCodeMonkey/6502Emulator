@@ -30,7 +30,6 @@ Also, I used this project as a way to practice some Test Driven Development (TDD
 
 This library does not support any of the undocumented 6502 instructions.  
 It also currently does nothing for the BRK and RTI instructions.  
-Decimal mode is also not supported (yet!).
   
 <br>
 
@@ -52,7 +51,6 @@ From a developer's point of view, the emulator is used as follows:
 ### What next?
 
 The following are features that are being considered for the future:  
-1. Add Decimal mode support.
-2. Implement a 6502 disassembler.
-3. Implement some form of interactive debugger (with features such as single stepping, breakpoint handling, etc.).
-4. Implement a 6502 assembler (because it's a tad frustrating having to supply 6502 executable data in binary format... something that is very reminiscent of the days when I used to type in machine code programs that they used to print in computer magazines in the 80's - urghhh!).
+1. Implement a 6502 disassembler.
+2. Implement some form of interactive debugger (with features such as single stepping, breakpoint handling, etc.).
+3. Implement a 6502 assembler (because it's a tad frustrating having to supply 6502 executable data in binary format... something that is very reminiscent of the days when I used to type in machine code programs that they used to print in computer magazines in the 80's - urghhh!).
