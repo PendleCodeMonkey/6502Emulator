@@ -2080,6 +2080,10 @@ namespace PendleCodeMonkey.MOS6502Emulator.Tests
 		[InlineData(0x40, 0x40, (ProcessorFlags)0, 0x80, ProcessorFlags.Negative | ProcessorFlags.Overflow)]
 		[InlineData(0x40, 0x60, ProcessorFlags.Carry, 0xA1, ProcessorFlags.Negative | ProcessorFlags.Overflow)]
 		[InlineData(0x90, 0x80, ProcessorFlags.Carry, 0x11, ProcessorFlags.Carry | ProcessorFlags.Overflow)]
+		[InlineData(0x58, 0x46, ProcessorFlags.Decimal | ProcessorFlags.Carry, 0x05, ProcessorFlags.Carry | ProcessorFlags.Decimal)]
+		[InlineData(0x12, 0x34, ProcessorFlags.Decimal, 0x46, ProcessorFlags.Decimal)]
+		[InlineData(0x15, 0x26, ProcessorFlags.Decimal, 0x41, ProcessorFlags.Decimal)]
+		[InlineData(0x81, 0x92, ProcessorFlags.Decimal, 0x73, ProcessorFlags.Carry | ProcessorFlags.Decimal)]
 		public void ADC_Immediate(byte accumulator, byte add, ProcessorFlags initFlags, byte expectedResult, ProcessorFlags expectedFlags)
 		{
 			// Arrange
@@ -2626,6 +2630,11 @@ namespace PendleCodeMonkey.MOS6502Emulator.Tests
 		[InlineData(0x40, 0x40, (ProcessorFlags)0, 0xFF, ProcessorFlags.Negative)]
 		[InlineData(0x50, 0xB0, ProcessorFlags.Carry, 0xA0, ProcessorFlags.Overflow | ProcessorFlags.Negative)]
 		[InlineData(0xD0, 0x70, ProcessorFlags.Carry, 0x60, ProcessorFlags.Overflow | ProcessorFlags.Carry)]
+		[InlineData(0x46, 0x12, ProcessorFlags.Decimal | ProcessorFlags.Carry, 0x34, ProcessorFlags.Carry | ProcessorFlags.Decimal)]
+		[InlineData(0x40, 0x13, ProcessorFlags.Decimal | ProcessorFlags.Carry, 0x27, ProcessorFlags.Carry | ProcessorFlags.Decimal)]
+		[InlineData(0x32, 0x02, ProcessorFlags.Decimal, 0x29, ProcessorFlags.Carry | ProcessorFlags.Decimal)]
+		[InlineData(0x12, 0x21, ProcessorFlags.Decimal | ProcessorFlags.Carry, 0x91, ProcessorFlags.Decimal)]
+		[InlineData(0x21, 0x34, ProcessorFlags.Decimal | ProcessorFlags.Carry, 0x87, ProcessorFlags.Decimal)]
 		public void SBC_Immediate(byte accumulator, byte sub, ProcessorFlags initFlags, byte expectedResult, ProcessorFlags expectedFlags)
 		{
 			// Arrange

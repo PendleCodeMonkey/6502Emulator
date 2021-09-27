@@ -437,6 +437,13 @@ namespace PendleCodeMonkey.MOS6502EmulatorLib
 		/// <param name="value">The value to be added.</param>
 		private void AddWithCarry(byte value)
 		{
+			// When in Decimal mode we need to perform BCD arithmetic instead of standard binary arithmetic.
+			if (Machine.CPU.SR.Decimal)
+			{
+				DecimalAddWithCarry(value);
+				return;
+			}
+
 			byte initA = Machine.CPU.A;
 			ushort result = (ushort)(Machine.CPU.A + value);
 			if (Machine.CPU.SR.Carry)
@@ -453,16 +460,75 @@ namespace PendleCodeMonkey.MOS6502EmulatorLib
 		}
 
 		/// <summary>
+		/// Adds the supplied value (with carry) to the Accumulator in Decimal mode (i.e. using BCD arithmetic).
+		/// </summary>
+		/// <remarks>
+		/// This method only affects the Carry flag, whose value is set according to the result of the add operation.
+		/// On a 6502 processor, the state of the Negative, Zero, and Overflow flags are not consistent with
+		/// the decimal result of an ADC instruction and are therefore not altered by this method.
+		/// </remarks>
+		/// <param name="value">The value to be added.</param>
+		private void DecimalAddWithCarry(byte value)
+		{
+			bool carry = false;
+			byte lo = (byte)((Machine.CPU.A & 0x0F) + (value & 0x0F) + (Machine.CPU.SR.Carry ? 1 : 0));
+			ushort result = (ushort)((Machine.CPU.A & 0xF0) + (value & 0xF0) + (lo > 0x09 ? (0x10 + lo - 0x0A) : lo));
+			if (result > 0x99)
+			{
+				carry = true;
+				result -= 0xA0;
+			}
+			Machine.CPU.A = (byte)result;
+			Machine.CPU.SR.Carry = carry;
+		}
+
+		/// <summary>
 		/// Subtracts the supplied value from the Accumulator (with borrow).
 		/// </summary>
 		/// <remarks>
-		/// Subtraction is the same as performing an addition using the complemented value.
-		/// This method also sets the flags according to the result of the add operation.
+		/// For binary mode (i.e. not Decimal mode), subtraction is the same as performing an addition using the complemented value.
+		/// This method sets the flags according to the result of the add operation.
 		/// </remarks>
 		/// <param name="value">The value to be subtracted.</param>
 		private void SubtractWithBorrow(byte value)
 		{
+			// When in Decimal mode we need to perform BCD arithmetic instead of standard binary arithmetic.
+			if (Machine.CPU.SR.Decimal)
+			{
+				DecimalSubtractWithBorrow(value);
+				return;
+			}
+
 			AddWithCarry((byte)~value);
+		}
+
+		/// <summary>
+		/// Subtracts the supplied value from the Accumulator (with borrow) in Decimal mode (i.e. using BCD arithmetic).
+		/// </summary>
+		/// <remarks>
+		/// This method only affects the Carry flag, whose value is set according to the result of the subtract operation.
+		/// On a 6502 processor, the state of the Negative, Zero, and Overflow flags are not consistent with
+		/// the decimal result of a SBC instruction and are therefore not altered by this method.
+		/// </remarks>
+		/// <param name="value">The value to be subtracted.</param>
+		private void DecimalSubtractWithBorrow(byte value)
+		{
+			bool carry = true;		// Resulting Carry is true by default for SBC instructions (as the negated Carry is handled as a Borrow flag).
+			byte lo = (byte)((Machine.CPU.A & 0x0F) - (value & 0x0F) - (Machine.CPU.SR.Carry ? 0 : 1));
+			byte hi = (byte)((Machine.CPU.A & 0xF0) - (value & 0xF0));
+
+			if ((byte)(lo & 0x80) == 0x80)
+			{
+				lo = (byte)(lo + 0x0A);
+				hi -= 0x10;
+			}
+			if (hi > 0x90)
+			{
+				hi = (byte)(hi + 0xA0);
+				carry = false;
+			}
+			Machine.CPU.A = (byte)(hi + lo);
+			Machine.CPU.SR.Carry = carry;
 		}
 
 		/// <summary>
