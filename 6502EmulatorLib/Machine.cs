@@ -223,22 +223,20 @@ namespace PendleCodeMonkey.MOS6502EmulatorLib
 		/// <summary>
 		/// Helper method to get the address for an instruction that uses the X-Indexed Zero Page addressing mode - $nn,X.
 		/// </summary>
+		/// <remarks>
+		/// Expect wrap-around when adding X to the zero page address exceeds the bounds of page zero.
+		/// </remarks>
 		/// <returns>The X-Indexed Zero Page address.</returns>
-		internal byte GetZeroPageXAddress()
-		{
-			// expect wrap around
-			return (byte)(ReadNextPCByte() + CPU.X);
-		}
+		internal byte GetZeroPageXAddress() => (byte)(ReadNextPCByte() + CPU.X);
 
 		/// <summary>
 		/// Helper method to get the address for an instruction that uses the Y-Indexed Zero Page addressing mode - $nn,Y.
 		/// </summary>
+		/// <remarks>
+		/// Expect wrap-around when adding Y to the zero page address exceeds the bounds of page zero.
+		/// </remarks>
 		/// <returns>The Y-Indexed Zero Page address.</returns>
-		internal byte GetZeroPageYAddress()
-		{
-			// expect wrap around
-			return (byte)(ReadNextPCByte() + CPU.Y);
-		}
+		internal byte GetZeroPageYAddress() => (byte)(ReadNextPCByte() + CPU.Y);
 
 		/// <summary>
 		/// Helper method to get the address for an instruction that uses the Absolute addressing mode - $nnnn.

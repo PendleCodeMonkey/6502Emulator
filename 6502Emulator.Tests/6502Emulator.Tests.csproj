@@ -5,6 +5,8 @@
     <RootNamespace>PendleCodeMonkey.MOS6502Emulator.Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
+
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

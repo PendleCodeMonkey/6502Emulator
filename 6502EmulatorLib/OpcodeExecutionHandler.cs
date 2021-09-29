@@ -16,7 +16,7 @@ namespace PendleCodeMonkey.MOS6502EmulatorLib
 		/// <summary>
 		/// Initializes a new instance of the <see cref="OpcodeExecutionHandler"/> class.
 		/// </summary>
-		/// <param machine="A">The <see cref="Machine"/> instance for which this object is handling the execution of instructions.</param>
+		/// <param name="machine">The <see cref="Machine"/> instance for which this object is handling the execution of instructions.</param>
 		public OpcodeExecutionHandler(Machine machine)
 		{
 			Machine = machine;

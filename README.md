@@ -48,9 +48,33 @@ From a developer's point of view, the emulator is used as follows:
 
 <br>
 
+### Disassembler
+
+The disassembler takes binary 6502 code and converts it to 6502 Assembly Language instructions. The included **6502EmulatorConsoleTestApp** project includes a simple demonstration of this.  
+
+The disassembler functionality is used as follows:  
+1. Create an instance of the `Machine` class and load executable data into it (as above).  
+2. Create an instance of the `Disassembler` class, supplying the `Machine` class instance, the address in memory at which to start disassembly, and the length of the code (in bytes).  
+3. Add non-executable data sections as required - these allow you to mark specific blocks of memory as containing data that is not executable (this tells the disassembler not to attempt to disassemble this data into [what would be invalid] 6502 instructions; instead, it will output them as byte values using a DB assembler directive).  
+4. Call the `Disassemble` method to perform the disassembly. This method returns a collection of tuple values, each of which consists of the address of the instruction and a string containing the disassembled instruction; for example, (20000, "LDA #$50").  
+5. Iterate through the collection of tuples, outputting each address and disassembled instruction string (see the **6502EmulatorConsoleTestApp** project for an example of this).
+
+<br>
+
 ### What next?
 
 The following are features that are being considered for the future:  
-1. Implement a 6502 disassembler.
-2. Implement some form of interactive debugger (with features such as single stepping, breakpoint handling, etc.).
-3. Implement a 6502 assembler (because it's a tad frustrating having to supply 6502 executable data in binary format... something that is very reminiscent of the days when I used to type in machine code programs that they used to print in computer magazines in the 80's - urghhh!).
+1. Implement some form of interactive debugger (with features such as single stepping, breakpoint handling, etc.).
+2. Implement a 6502 assembler (because it's a tad frustrating having to supply 6502 executable data in binary format... something that is very reminiscent of the days when I used to type in machine code programs that they used to print in computer magazines in the 80's - urghhh!).
+
+
+<br>
+
+### History
+
+| Version | Details
+|---:| ---
+| 1.0.0 | Initial implementation of 6502 emulator.
+| 1.1.0 | Added Disassembler support.
+
+
