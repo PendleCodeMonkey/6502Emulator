@@ -1,5 +1,9 @@
 ﻿using PendleCodeMonkey.MOS6502EmulatorLib;
+using PendleCodeMonkey.MOS6502EmulatorLib.Assembler;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 
 namespace PendleCodeMonkey.MOS6502EmulatorConsoleApp
 {
@@ -20,6 +24,8 @@ namespace PendleCodeMonkey.MOS6502EmulatorConsoleApp
 			Console.WriteLine("Disassembler test:");
 			Console.WriteLine("------------------");
 			TestDisassembler();
+
+			AssemblerTestHardCodedSource();
 		}
 
 		public static void FibonacciCalculator()
@@ -79,6 +85,131 @@ namespace PendleCodeMonkey.MOS6502EmulatorConsoleApp
 			{
 				Console.WriteLine($"0x{Address:X4} - {Disassembly}");
 			}
+		}
+
+
+
+
+
+		static void AssemblerTestHardCodedSource()
+		{
+			Console.WriteLine();
+			Console.WriteLine("Testing Assembler using hard-coded source code:");
+			Console.WriteLine("-----------------------------------------------");
+			Console.WriteLine();
+
+			var code = Get6502SourceCode();
+
+			if (code != null && code.Count > 0)
+			{
+				Console.WriteLine("ASSEMBLING CODE.  Please wait...");
+				Console.WriteLine();
+
+				Assembler asm = new Assembler();
+				var (success, binData) = asm.Assemble(code);
+
+				if (!success)
+				{
+					Console.BackgroundColor = ConsoleColor.Red;
+					Console.ForegroundColor = ConsoleColor.White;
+					Console.Write("FAILED TO ASSEMBLE CODE:");
+					Console.ResetColor();
+					Console.WriteLine();
+					Console.WriteLine();
+					foreach (var (LineNumber, Error, AdditionalInfo) in asm.AsmErrors)
+					{
+						Console.WriteLine($"{Error} [ {AdditionalInfo} ] on line {LineNumber}");
+					}
+				}
+				else
+				{
+					Console.BackgroundColor = ConsoleColor.DarkGreen;
+					Console.ForegroundColor = ConsoleColor.White;
+					Console.Write("CODE WAS SUCCESSFULLY ASSEMBLED.");
+					Console.ResetColor();
+					Console.WriteLine();
+					Console.WriteLine();
+
+					// Write the generated binary data to a file.
+					byte[] binDataArray = binData.ToArray();
+					string path = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+					path = Path.Combine(path, "AsmGenerated.bin");
+					File.WriteAllBytes(path, binDataArray);
+
+					// Fire up an instance of the emulator and get it to execute the generated binary code and produce a disassembly of it.
+					Machine machine = new Machine();
+					machine.LoadExecutableData(binData.ToArray(), 0x1000);
+
+					DateTime today = DateTime.Today;
+					machine.SetState(A: (byte)today.Day, X: (byte)today.Month, Y: (byte)(today.Year - 1900), flags: 0);
+
+					// Execute the assembled binary data.
+					machine.Execute();
+
+					string[] days = new string[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+					var (A, _, _, _, _, _) = machine.GetState();
+					Console.WriteLine($"Assembled day of week calculator. Result is in A register: A = {A}    **** Today is {days[A]} ****");
+					Console.WriteLine("[ 0 - Sunday, 1 - Monday, 2 - Tuesday, 3 - Wednesday, 4 - Thursday, 5 - Friday, 6 - Saturday ]");
+
+					// Disassemble the generated binary data.
+					Disassembler disassembler = new Disassembler(machine, startAddress: 0x1000, length: (ushort)binData.Count);
+
+					// Mark the data segments that were created during assembly as non-executable blocks.
+					foreach (var (startAddress, size) in asm.DataSegments)
+					{
+						disassembler.AddNonExecutableSection(startAddress, size);
+					}
+
+					var dis = disassembler.Disassemble();
+
+					// Write disassembly output to a file.
+					string path2 = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+					path2 = Path.Combine(path2, "Disassembled.asm");
+					try
+					{
+						using StreamWriter writer = new StreamWriter(path2);
+						foreach (var (Address, Disassembly) in dis)
+						{
+							writer.WriteLine($"{Disassembly}\t\t; [{Address:X4}]");
+						}
+					}
+					catch (Exception)
+					{
+						Console.WriteLine("Error occurred attempting to write file: Disassembled.asm");
+					}
+				}
+			}
+		}
+
+		static List<string> Get6502SourceCode()
+		{
+			List<string> source = new List<string>
+			{
+				"ORG $1000",
+				"TEMP      EQU $FF",
+				"CPX #3",
+				"BCS MARCHORLATER",
+				"DEY",
+				"MARCHORLATER:   EOR #$7F",
+				"CPY #200",
+				"ADC MONTHTABLE-1,X",
+				"STA TEMP",
+				"TYA",
+				"JSR MODULO7",
+				"SBC TEMP",
+				"STA TEMP",
+				"TYA",
+				"LSR",
+				"LSR",
+				"CLC",
+				"ADC TEMP",
+				"MODULO7:    ADC #7",
+				"BCC MODULO7",
+				"RTS",
+				"MONTHTABLE:    DB 1, 5, 6, 3, 1, 5, 3, 0, 4, 2, 6, 4"
+			};
+
+			return source;
 		}
 	}
 }

@@ -219,7 +219,7 @@ namespace PendleCodeMonkey.MOS6502EmulatorLib
 				{
 					sb.Append(", ");
 				}
-				sb.Append($"0x{value:X2}");
+				sb.Append($"${value:X2}");
 			}
 			return sb.ToString();
 		}

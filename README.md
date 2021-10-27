@@ -61,11 +61,24 @@ The disassembler functionality is used as follows:
 
 <br>
 
+
+### Assembler
+
+The assembler takes 6502 assembly language source code and generates 6502 binary code from it. The included **6502EmulatorConsoleTestApp** project includes a demonstration of this.  
+
+The assembler functionality is used as follows:  
+1. Create an instance of the `Assembler` class.  
+2. Call the `Assemble` method, passing a list of strings containing the lines of 6502 assembly language source code (one string per line of source code). This method returns a tuple, the first value of which indicates if the assembler successfully processed the supplied source code, if so, the second tuple value is a collection of bytes consisting of the generated binary data.  
+3. Once successfully assembled, the binary data can then be written out to a file or fed straight into the emulator to be executed (see the **6502EmulatorConsoleTestApp** project for an example of this).
+4. If the assembler failed to process the source code then the `AsmErrors` property of the instance of the `Assembler` class can be accessed to obtain information about any errors that occurred during assembly.
+  
+<br>
+
 ### What next?
 
 The following are features that are being considered for the future:  
 1. Implement some form of interactive debugger (with features such as single stepping, breakpoint handling, etc.).
-2. Implement a 6502 assembler (because it's a tad frustrating having to supply 6502 executable data in binary format... something that is very reminiscent of the days when I used to type in machine code programs that they used to print in computer magazines in the 80's - urghhh!).
+2. Add support for undocumented 6502 instructions.
 
 
 <br>
@@ -76,5 +89,6 @@ The following are features that are being considered for the future:
 |---:| ---
 | 1.0.0 | Initial implementation of 6502 emulator.
 | 1.1.0 | Added Disassembler support.
+| 1.2.0 | Added Assembler functionality.
 
 

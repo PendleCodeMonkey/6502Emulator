@@ -1,7 +1,6 @@
 ﻿using PendleCodeMonkey.MOS6502EmulatorLib.Enumerations;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace PendleCodeMonkey.MOS6502EmulatorLib
 {
@@ -302,5 +301,28 @@ namespace PendleCodeMonkey.MOS6502EmulatorLib
 			{ AddressingModes.ZeroPageX, " ${0:X2},X" },
 			{ AddressingModes.ZeroPageY, " ${0:X2},Y" }
 		};
+
+
+		/// <summary>
+		/// Find the opcode value corresponding to the specified instruction mnemonic and addressing mode combination.
+		/// </summary>
+		/// <param name="mnemonic">The 6502 instruction mnemonic.</param>
+		/// <param name="addrMode">The addressing mode being used.</param>
+		/// <returns>
+		/// A byte containing the opcode value corresponding to the specified instruction mnemonic and
+		/// addressing mode combination (or null if the mnemonic and addressing mode combination is invalid).
+		/// </returns>
+		public static byte? FindInstruction(string mnemonic, AddressingModes addrMode)
+		{
+			byte? retVal = null;
+
+			var elem = Instructions.Where(x => x.Value.Name.Equals(mnemonic) && x.Value.AddrMode == addrMode).Select(x => x.Key);
+			if (elem.Count() == 1)
+			{
+				retVal = (byte)elem.First();
+			}
+
+			return retVal;
+		}
 	}
 }
